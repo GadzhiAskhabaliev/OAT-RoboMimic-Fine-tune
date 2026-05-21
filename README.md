@@ -22,6 +22,36 @@
    git submodule update --init --recursive
    ```
 
+## Docker workflow (cluster)
+
+If cluster policy requires Docker-only training, use the scripts under `docker/`.
+
+1. Build image:
+
+   ```bash
+   bash docker/build.sh
+   ```
+
+2. Start container:
+
+   ```bash
+   bash docker/start.sh
+   ```
+
+3. Enter container:
+
+   ```bash
+   bash docker/into.sh
+   ```
+
+4. Bootstrap Python deps inside container (first time):
+
+   ```bash
+   bash docker/bootstrap.sh
+   ```
+
+All repo files are mounted to `/workspace/OAT-RoboMimic-Fine-tune` inside the container, so run the same training / conversion commands from this README there.
+
 ### option 1: uv
 2. Install `uv` if you do not already have it. Follow the [uv installation guide](https://docs.astral.sh/uv/getting-started/installation/).
 
@@ -111,6 +141,74 @@ uv run scripts/eval_policy_sim.py \
 ```
 
 The script instantiates the same LIBERO runner and dataset from `oat.config.task.policy.libero.libero10` and dumps per-checkpoint statistics plus optional videos to `output/eval/libero10`.
+
+## RoboMimic (Lift / Can / Square)
+
+### 1) Prepare RoboMimic HDF5 dumps
+
+Download or place RoboMimic task files under:
+
+```bash
+data/robomimic/hdf5_datasets/
+```
+
+Supported tasks in this repo are `lift`, `can`, and `square`. The converter expects RoboMimic-style HDF5 structure (`data/demo_*/actions` and `data/demo_*/obs/*`), documented in the official RoboMimic dataset overview: [robomimic dataset structure](https://robomimic.github.io/docs/v0.3/datasets/overview.html).
+
+### 2) Convert HDF5 to zarr
+
+```bash
+uv run scripts/convert_robomimic_dataset.py \
+  --root_dir data/robomimic \
+  --hdf5_dir_name hdf5_datasets
+```
+
+By default this exports:
+- `data/robomimic/lift_N{episodes}.zarr`
+- `data/robomimic/can_N{episodes}.zarr`
+- `data/robomimic/square_N{episodes}.zarr`
+
+### 3) Optional: train tokenizer on RoboMimic actions
+
+```bash
+HYDRA_FULL_ERROR=1 uv run accelerate launch \
+  --num_machines [num_node] \
+  --multi_gpu \
+  --num_processes [num_gpu] \
+  scripts/run_workspace.py \
+  --config-name=train_oattok \
+  task/tokenizer=robomimic/lift
+```
+
+Repeat with `task/tokenizer=robomimic/can` and `task/tokenizer=robomimic/square` as needed.
+
+### 4) Train policy with pretrained OAT tokenizer
+
+Pretrained checkpoints are available here: [Mirageinv/oat checkpoints](https://huggingface.co/Mirageinv/oat/tree/main).
+
+```bash
+HYDRA_FULL_ERROR=1 MUJOCO_GL=egl uv run accelerate launch \
+  --num_machines [num_node] \
+  --multi_gpu \
+  --num_processes [num_gpu] \
+  scripts/run_workspace.py \
+  --config-name=train_oatpolicy \
+  task/policy=robomimic/lift \
+  policy.action_tokenizer.checkpoint=[path/to/tokenizer_ep-0950_mse-0.002.ckpt] \
+  training.num_demo=[num_demos_in_lift_zarr]
+```
+
+Replace `task/policy` with `robomimic/can` or `robomimic/square` for the other tasks.
+
+### 5) Evaluate policy in sim
+
+```bash
+uv run scripts/eval_policy_sim.py \
+  --checkpoint [path/to/oatpolicy.ckpt] \
+  --output_dir output/eval/robomimic_lift \
+  --num_exp 5
+```
+
+The eval script reads `cfg.task.policy.env_runner`, so the same command format works for `can` and `square` checkpoints.
 
 ## Further reading
 
