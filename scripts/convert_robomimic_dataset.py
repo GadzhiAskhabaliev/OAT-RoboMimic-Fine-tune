@@ -15,12 +15,13 @@ import pathlib
 import shutil
 
 import click
+import h5py
 import zarr
 
 from oat.common.input_util import wait_user_input
 from oat.env.robomimic.dataset_conversion import (
     DEFAULT_REQUIRED_OBS_KEYS,
-    convert_robomimic_hdf5_to_zarr,
+    convert_robomimic_hdf5_to_zarr_streaming,
     infer_task_name,
 )
 
@@ -30,6 +31,9 @@ from oat.env.robomimic.dataset_conversion import (
 @click.option("--hdf5_dir_name", type=str, default="hdf5_datasets")
 @click.option("-n", "--num_sample_demo", type=int, default=None)
 @click.option("--seed", type=int, default=42)
+@click.option("--compression_level", type=int, default=5, show_default=True)
+@click.option("--chunk_size", type=int, default=1024, show_default=True)
+@click.option("--verify_sample_size", type=int, default=128, show_default=True)
 @click.option(
     "--required_obs_key",
     type=str,
@@ -42,6 +46,9 @@ def convert_all_robomimic_datasets(
     hdf5_dir_name: str,
     num_sample_demo: int,
     seed: int,
+    compression_level: int,
+    chunk_size: int,
+    verify_sample_size: int,
     required_obs_key: tuple[str, ...],
 ):
     hdf5_root = pathlib.Path(root_dir) / hdf5_dir_name
@@ -52,16 +59,12 @@ def convert_all_robomimic_datasets(
     for hdf5_path in hdf5_paths:
         hdf5_path_str = str(hdf5_path)
         print(f"Converting {hdf5_path_str}...")
-        replay_buffer = convert_robomimic_hdf5_to_zarr(
-            hdf5_path=hdf5_path_str,
-            sample_ndemo=num_sample_demo,
-            required_obs_keys=required_obs_key,
-            seed=seed,
-        )
 
         task_name = infer_task_name(hdf5_path_str)
-        n_demo = replay_buffer.n_episodes
-        save_path = pathlib.Path(root_dir) / f"{task_name}_N{n_demo}.zarr"
+        with h5py.File(hdf5_path_str, "r") as f:
+            all_demo_keys = [k for k in f["data"].keys() if k.startswith("demo_")]
+            expected_n_demo = len(all_demo_keys) if num_sample_demo is None else min(num_sample_demo, len(all_demo_keys))
+        save_path = pathlib.Path(root_dir) / f"{task_name}_N{expected_n_demo}.zarr"
 
         if save_path.exists():
             keypress = wait_user_input(
@@ -74,10 +77,21 @@ def convert_all_robomimic_datasets(
                 continue
             shutil.rmtree(save_path)
 
-        save_path.mkdir(parents=True, exist_ok=True)
-        compressor = zarr.Blosc(cname="zstd", clevel=5, shuffle=1)
-        replay_buffer.save_to_path(str(save_path), compressor=compressor)
-        print(f"Saved to {save_path}")
+        compressor = zarr.Blosc(cname="zstd", clevel=compression_level, shuffle=1)
+        stats = convert_robomimic_hdf5_to_zarr_streaming(
+            hdf5_path=hdf5_path_str,
+            zarr_path=str(save_path),
+            sample_ndemo=num_sample_demo,
+            required_obs_keys=required_obs_key,
+            seed=seed,
+            compressor=compressor,
+            chunk_size=chunk_size,
+            verify_sample_size=verify_sample_size,
+        )
+        print(
+            f"Verification passed: episodes={stats['episodes']}, "
+            f"steps={stats['steps']}, action_dim={stats['action_dim']}"
+        )
 
     print("All done.")
 
