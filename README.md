@@ -159,7 +159,9 @@ Supported tasks in this repo are `lift`, `can`, and `square`. The converter expe
 ```bash
 uv run scripts/convert_robomimic_dataset.py \
   --root_dir data/robomimic \
-  --hdf5_dir_name hdf5_datasets
+  --hdf5_dir_name hdf5_datasets \
+  --compression_level 5 \
+  --chunk_size 1024
 ```
 
 By default this exports:
