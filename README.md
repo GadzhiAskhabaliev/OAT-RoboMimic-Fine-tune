@@ -2,12 +2,6 @@
 
 [[Paper]](https://arxiv.org/abs/2602.04215) | [[Webpage]](https://ordered-action-tokenization.github.io/)
 
-![GitHub last commit](https://img.shields.io/github/last-commit/GadzhiAskhabaliev/OAT-RoboMimic-Fine-tune?style=for-the-badge)
-![GitHub repo size](https://img.shields.io/github/repo-size/GadzhiAskhabaliev/OAT-RoboMimic-Fine-tune?style=for-the-badge)
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=for-the-badge)
-![Docker ready](https://img.shields.io/badge/Docker-Cluster_Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Dataset](https://img.shields.io/badge/Dataset-RoboMimic_Lift_Image-success?style=for-the-badge)
-
 [Chaoqi Liu](https://chaoqi-liu.com)<sup>1</sup>, 
 [Xiaoshen Han](https://xshenhan.github.io/)<sup>1</sup>, 
 [Jiawei Gao](https://gao-jiawei.com/)<sup>1</sup>, 
@@ -17,43 +11,6 @@
 
 <sup>1</sup>Harvard University
 <sup>2</sup>Stanford University
-
-## Project showcase (for committee review)
-
-This repository extends the official OAT implementation with an end-to-end RoboMimic pipeline, focused on reproducible two-stage training on the Lift image task:
-
-- Stage 1: train `OAT tokenizer` from scratch on RoboMimic Lift actions.
-- Stage 2: train `OAT policy` from scratch using the Stage-1 tokenizer checkpoint.
-- Cluster-first workflow: Docker-based execution, tmux-safe long runs, disk-aware checkpointing.
-- Reproducibility artifacts: logs, checkpoints, and dashboards tracked in Hugging Face.
-
-### Visual training pipeline
-
-```mermaid
-flowchart LR
-    hdf5["RoboMimic HDF5 (image + state)"] --> convert["Streaming HDF5 -> Zarr conversion"]
-    convert --> tok["Stage 1: train_oattok (from scratch)"]
-    tok --> tokCkpt["Tokenizer checkpoint"]
-    tokCkpt --> pol["Stage 2: train_oatpolicy (from scratch)"]
-    pol --> eval["Simulation evaluation"]
-    pol --> viz["Training dashboards (PNG/SVG/JSON)"]
-    eval --> artifacts["Published artifacts (HF + GitHub)"]
-    viz --> artifacts
-```
-
-### Public artifacts
-
-- Hugging Face repo: [hackhackhack66666/OAT-Robomimic-lift-image](https://huggingface.co/hackhackhack66666/OAT-Robomimic-lift-image)
-- Policy checkpoint (latest exported): [checkpoints/oatpolicy_lift_latest_ep736.ckpt](https://huggingface.co/hackhackhack66666/OAT-Robomimic-lift-image/blob/main/checkpoints/oatpolicy_lift_latest_ep736.ckpt)
-- Training dashboard (PNG): [plots/lift_training_dashboard.png](https://huggingface.co/hackhackhack66666/OAT-Robomimic-lift-image/blob/main/plots/lift_training_dashboard.png)
-- Training dashboard summary (JSON): [plots/lift_training_dashboard_summary.json](https://huggingface.co/hackhackhack66666/OAT-Robomimic-lift-image/blob/main/plots/lift_training_dashboard_summary.json)
-
-### Review navigation
-
-- RoboMimic conversion logic: [`scripts/convert_robomimic_dataset.py`](scripts/convert_robomimic_dataset.py), [`oat/env/robomimic/dataset_conversion.py`](oat/env/robomimic/dataset_conversion.py)
-- Two-stage launcher: [`scripts/run_robomimic_lift_two_stage.sh`](scripts/run_robomimic_lift_two_stage.sh)
-- Training visualization: [`scripts/plot_oat_training_log.py`](scripts/plot_oat_training_log.py)
-- RoboMimic env + runner: [`oat/env/robomimic/env.py`](oat/env/robomimic/env.py), [`oat/env_runner/robomimic_runner.py`](oat/env_runner/robomimic_runner.py)
 
 
 ## Quick start
