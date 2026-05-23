@@ -169,7 +169,7 @@ By default this exports:
 - `data/robomimic/can_N{episodes}.zarr`
 - `data/robomimic/square_N{episodes}.zarr`
 
-### 3) Optional: train tokenizer on RoboMimic actions
+### 3) Stage 1: train tokenizer from scratch on RoboMimic Lift
 
 ```bash
 HYDRA_FULL_ERROR=1 uv run accelerate launch \
@@ -178,14 +178,16 @@ HYDRA_FULL_ERROR=1 uv run accelerate launch \
   --num_processes [num_gpu] \
   scripts/run_workspace.py \
   --config-name=train_oattok \
-  task/tokenizer=robomimic/lift
+  task/tokenizer=robomimic/lift \
+  training.num_demo=[num_demos_in_lift_zarr] \
+  training.checkpoint_every=250 \
+  checkpoint.topk.k=1 \
+  logging.mode=disabled
 ```
 
-Repeat with `task/tokenizer=robomimic/can` and `task/tokenizer=robomimic/square` as needed.
+This stage is required for the two-stage reproduction pipeline. Keep the produced tokenizer checkpoint path for Stage 2.
 
-### 4) Train policy with pretrained OAT tokenizer
-
-Pretrained checkpoints are available here: [Mirageinv/oat checkpoints](https://huggingface.co/Mirageinv/oat/tree/main).
+### 4) Stage 2: train policy from scratch with Stage-1 tokenizer
 
 ```bash
 HYDRA_FULL_ERROR=1 MUJOCO_GL=egl uv run accelerate launch \
@@ -195,8 +197,11 @@ HYDRA_FULL_ERROR=1 MUJOCO_GL=egl uv run accelerate launch \
   scripts/run_workspace.py \
   --config-name=train_oatpolicy \
   task/policy=robomimic/lift \
-  policy.action_tokenizer.checkpoint=[path/to/tokenizer_ep-0950_mse-0.002.ckpt] \
-  training.num_demo=[num_demos_in_lift_zarr]
+  policy.action_tokenizer.checkpoint=[path/to/stage1_tokenizer.ckpt] \
+  training.num_demo=[num_demos_in_lift_zarr] \
+  training.checkpoint_every=250 \
+  checkpoint.topk.k=1 \
+  logging.mode=disabled
 ```
 
 Replace `task/policy` with `robomimic/can` or `robomimic/square` for the other tasks.
