@@ -12,6 +12,40 @@
 <sup>1</sup>Harvard University
 <sup>2</sup>Stanford University
 
+## RoboMimic Lift Reproduction Status
+
+![Stage](https://img.shields.io/badge/Two--Stage%20Pipeline-Completed-22c55e)
+![Eval](https://img.shields.io/badge/Eval%20(10%20runs)-Completed-22c55e)
+![Success](https://img.shields.io/badge/Mean%20Success%20Rate-0.8380-2563eb)
+![StdErr](https://img.shields.io/badge/StdErr-0.0156-f59e0b)
+
+We reproduced the **two-stage OAT training procedure** on RoboMimic Lift Image (train tokenizer from scratch, then train policy from scratch with the trained tokenizer) and reached a stable evaluation result across 10 runs:
+
+- `mean_success_rate = 0.8380`
+- `std = 0.0494`, `stderr = 0.0156`
+
+This is a successful reproduction of the **methodology and training recipe** from the paper on RoboMimic Lift.  
+Because the original paper does not publish an official RoboMimic Lift reference table in this repo, this should be treated as a strong reproduction run rather than a strict 1:1 benchmark parity claim.
+
+### Visual Dashboards
+
+- Stage-1 tokenizer dashboard (SVG): [open](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/plots/stage1/lift_training_dashboard.svg)
+- Stage-2 policy dashboard (SVG): [open](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/plots/stage2/lift_training_dashboard.svg)
+- Eval dashboard (PNG): [open](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/plots/lift_eval_dashboard.png)
+
+![Eval Dashboard](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/plots/lift_eval_dashboard.png)
+
+### Evaluation Videos (Sample)
+
+- [Episode sample A](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/media/lift/hkm6boo7.mp4)
+- [Episode sample B](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/media/lift/gmoug8dw.mp4)
+- [Episode sample C](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/media/lift/f4zx6o3u.mp4)
+
+### Full Artifact Repositories
+
+- Policy + eval artifacts: [hackhackhack66666/OAT-robomimic-lift-policy-tok](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok)
+- Tokenizer artifacts: [hackhackhack66666/OAT-tokenizator-Robo-Mimic-lift-Image](https://huggingface.co/hackhackhack66666/OAT-tokenizator-Robo-Mimic-lift-Image)
+
 
 ## Quick start
 1. Clone with submodules so that `third_party/LIBERO` is available:
