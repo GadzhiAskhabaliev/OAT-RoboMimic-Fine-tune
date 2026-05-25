@@ -14,11 +14,6 @@
 
 ## RoboMimic Lift Reproduction Status
 
-![Stage](https://img.shields.io/badge/Two--Stage%20Pipeline-Completed-22c55e)
-![Eval](https://img.shields.io/badge/Eval%20(10%20runs)-Completed-22c55e)
-![Success](https://img.shields.io/badge/Mean%20Success%20Rate-0.8380-2563eb)
-![StdErr](https://img.shields.io/badge/StdErr-0.0156-f59e0b)
-
 We reproduced the **two-stage OAT training procedure** on RoboMimic Lift Image (train tokenizer from scratch, then train policy from scratch with the trained tokenizer) and reached a stable evaluation result across 10 runs:
 
 - `mean_success_rate = 0.8380`
@@ -37,9 +32,9 @@ Because the original paper does not publish an official RoboMimic Lift reference
 
 ### Evaluation Videos (Sample)
 
-- [Episode sample A](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/media/lift/hkm6boo7.mp4)
-- [Episode sample B](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/media/lift/gmoug8dw.mp4)
-- [Episode sample C](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/media/lift/f4zx6o3u.mp4)
+![Lift rollout A](assets/eval_gifs/lift_rollout_a.gif)
+![Lift rollout B](assets/eval_gifs/lift_rollout_b.gif)
+![Lift rollout C](assets/eval_gifs/lift_rollout_c.gif)
 
 ### Full Artifact Repositories
 
