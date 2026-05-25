@@ -35,12 +35,6 @@ Because the original paper does not publish an official RoboMimic Lift reference
 <p align="center">
   <img src="assets/eval_gifs/lift_rollout_a.gif" width="420" alt="Lift rollout A (successful grasp)">
 </p>
-<p align="center">
-  <img src="assets/eval_gifs/lift_rollout_b.gif" width="420" alt="Lift rollout B (successful grasp)">
-</p>
-<p align="center">
-  <img src="assets/eval_gifs/lift_rollout_c.gif" width="420" alt="Lift rollout C (successful grasp)">
-</p>
 
 ### Full Artifact Repositories
 
