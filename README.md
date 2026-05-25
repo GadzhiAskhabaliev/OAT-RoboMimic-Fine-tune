@@ -24,8 +24,8 @@ Because the original paper does not publish an official RoboMimic Lift reference
 
 ### Visual Dashboards
 
-- Stage-1 tokenizer dashboard (SVG): [open](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/plots/stage1/lift_training_dashboard.svg)
-- Stage-2 policy dashboard (SVG): [open](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/plots/stage2/lift_training_dashboard.svg)
+- Stage-1 tokenizer dashboard (PNG): [open](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/plots/stage1/lift_training_dashboard.png)
+- Stage-2 policy dashboard (PNG): [open](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/plots/stage2/stage2_from_logs_json.png)
 - Eval dashboard (PNG): [open](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/plots/lift_eval_dashboard.png)
 
 ![Eval Dashboard](https://huggingface.co/hackhackhack66666/OAT-robomimic-lift-policy-tok/resolve/main/eval/plots/lift_eval_dashboard.png)
